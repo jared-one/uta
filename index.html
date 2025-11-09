@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Birthday Special</title>
+    <style>
+        :root {
+            --cosmic-primary: #000428;
+            --cosmic-secondary: #004e92;
+            --cosmic-accent: #b794f6;
+            --cosmic-glow: #9f7aea;
+            --cosmic-text: #f0e6ff;
+            --scroll-progress: 0;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --hue-shift: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(
+                180deg, 
+                hsl(223, calc(100% - var(--scroll-progress) * 20%), calc(8% + var(--scroll-progress) * 5%)),
+                hsl(209, calc(100% - var(--scroll-progress) * 30%), calc(29% + var(--scroll-progress) * 10%))
+            );
+            min-height: 100vh;
+            font-family: 'Georgia', serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            touch-action: manipulation;
+        }
+
+        /* Performance Stats */
+        .perf-stats {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0f0;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            border-radius: 8px;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0.8;
+            line-height: 1.6;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .perf-stats div {
+            margin: 2px 0;
+        }
+
+        .perf-stats .metric {
+            color: #00ff00;
+        }
+
+        .perf-stats .value {
+            color: #ffff00;
+            font-weight: bold;
+        }
+
+        .perf-stats .warning {
+            color: #ff6b6b;
+        }
+
+        .perf-stats .good {
+            color: #51cf66;
+        }
+
+        /* Entry Overlay */
+        .entry-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(
+                ellipse at var(--mouse-x) var(--mouse-y), 
+                #1b2735 0%, 
+                #090a0f 100%
+            );
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            transition: opacity 2s cubic-bezier(0.4, 0, 0, 1), 
+                        transform 2s cubic-bezier(0.4, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+
+        .entry-overlay.hidden {
+            opacity: 0;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        .entry-content {
+            text-align: center;
+            animation: breathe 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
+        }
+
+        .entry-title {
+            font-size: clamp(1.5em, 4vw, 2.5em);
+            margin-bottom: 20px;
+            background: linear-gradient(
+                90deg,
+                var(--cosmic-text),
+                var(--cosmic-accent),
+                var(--cosmic-glow),
+                var(--cosmic-accent),
+                var(--cosmic-text)
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        .entry-subtitle {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .enter-button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            background: transparent;
+            border: 1px solid rgba(183, 148, 246, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        .enter-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at var(--mouse-x) var(--mouse-y),
+                rgba(183, 148, 246, 0.2),
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .enter-button:hover::after {
+            opacity: 1;
+        }
+
+        .enter-button:hover {
+            border-color: rgba(183, 148, 246, 0.6);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Optimized Canvas Background */
+        #starCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 3s ease;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        #starCanvas.visible {
+            opacity: 1;
+        }
+
+        /* Sparkle Canvas */
+        #sparkleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #sparkleCanvas.visible {
+            opacity: 1;
+        }
+
+        /* Mouse Trail Canvas */
+        #trailCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #trailCanvas.visible {
+            opacity: 1;
+        }
+
+        /* Floating Orbs Canvas */
+        #orbCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #orbCanvas.visible {
+            opacity: 1;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header */
+        h1 {
+            font-size: clamp(1.8em, 5vw, 3em);
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(
+                135deg,
+                var(--cosmic-text),
+                var(--cosmic-accent),
+                var(--cosmic-glow)
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(159, 122, 234, 0.5));
+            line-height: 1.3;
+            opacity: 0;
+            animation: fadeInScale 1s forwards 0.5s;
+        }
+
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+        }
+
+        /* Birthday Date Display */
+        .birthday-date {
+            text-align: center;
+            margin: 20px auto 30px;
+            padding: 15px 30px;
+            max-width: 400px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.03),
+                rgba(255, 255, 255, 0.08)
+            );
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            animation: fadeInScale 1s forwards 0.6s;
+        }
+
+        .birthday-date .day {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(
+                90deg,
+                #ffd89b,
+                var(--cosmic-accent),
+                var(--cosmic-glow)
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .birthday-date .message {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Audio Container */
+        .audio-container {
+            text-align: center;
+            margin: 30px auto;
+            padding: 25px;
+            max-width: 500px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.02),
+                rgba(255, 255, 255, 0.05)
+            );
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInScale 1s forwards 0.7s;
+        }
+
+        .audio-container::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent,
+                var(--cosmic-accent),
+                transparent
+            );
+            animation: spin 20s linear infinite;
+            opacity: 0.05;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .audio-label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--cosmic-accent);
+            font-style: italic;
+            font-size: 1.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .audio-subtitle {
+            display: block;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .audio-visual {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            height: 40px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .audio-bar {
+            width: 4px;
+            background: linear-gradient(
+                to top,
+                var(--cosmic-accent),
+                var(--cosmic-glow)
+            );
+            border-radius: 2px;
+            transform-origin: bottom;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .audio-bar.playing {
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .audio-bar:nth-child(1) { height: 35%; animation-delay: 0ms; }
+        .audio-bar:nth-child(2) { height: 55%; animation-delay: 100ms; }
+        .audio-bar:nth-child(3) { height: 45%; animation-delay: 200ms; }
+        .audio-bar:nth-child(4) { height: 70%; animation-delay: 300ms; }
+        .audio-bar:nth-child(5) { height: 50%; animation-delay: 400ms; }
+        .audio-bar:nth-child(6) { height: 60%; animation-delay: 500ms; }
+        .audio-bar:nth-child(7) { height: 40%; animation-delay: 600ms; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        /* Single Center Image */
+        .memories {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 50px auto;
+            max-width: 900px;
+            perspective: 1000px;
+            opacity: 0;
+            animation: fadeInScale 1s forwards 0.9s;
+            min-height: 400px;
+        }
+
+        .memory-container {
+            position: relative;
+            transform-style: preserve-3d;
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+        }
+
+        .memory {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                        box-shadow 0.6s;
+            box-shadow: 
+                0 20px 60px rgba(138, 43, 226, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .memory::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                transparent 40%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 60%
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+            z-index: 2;
+        }
+
+        .memory:hover::before {
+            transform: translateX(100%);
+        }
+
+        .memory:hover {
+            transform: translateZ(50px) scale(1.05);
+            box-shadow: 
+                0 30px 80px rgba(138, 43, 226, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .memory img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s, filter 0.6s;
+        }
+
+        .memory:hover img {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+
+        /* Poem Title */
+        h2 {
+            font-size: 1.8em;
+            text-align: center;
+            margin: 60px 0 30px;
+            color: var(--cosmic-text);
+            font-style: italic;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInScale 1s forwards 1.3s;
+        }
+
+        /* Letter */
+        .letter {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.02),
+                rgba(255, 255, 255, 0.04)
+            );
+            border-radius: 25px;
+            padding: 50px;
+            margin: 30px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .letter::before {
+            content: '';
+            position: absolute;
+            inset: -100%;
+            background: radial-gradient(
+                circle at var(--mouse-x) var(--mouse-y),
+                rgba(138, 43, 226, 0.05),
+                transparent 50%
+            );
+            pointer-events: none;
+        }
+
+        .letter p {
+            line-height: 1.9;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: var(--cosmic-text);
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .letter.visible p {
+            animation: fadeUp 0.8s forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .letter p:nth-child(1) { animation-delay: 0.1s; }
+        .letter p:nth-child(2) { animation-delay: 0.2s; }
+        .letter p:nth-child(3) { animation-delay: 0.3s; }
+        .letter p:nth-child(4) { animation-delay: 0.4s; }
+        .letter p:nth-child(5) { animation-delay: 0.5s; }
+        .letter p:nth-child(6) { animation-delay: 0.6s; }
+        .letter p:nth-child(7) { animation-delay: 0.7s; }
+        .letter p:nth-child(8) { animation-delay: 0.8s; }
+
+        .letter em {
+            color: var(--cosmic-accent);
+            font-style: normal;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .letter em:hover {
+            color: white;
+            text-shadow: 0 0 20px var(--cosmic-accent);
+        }
+
+        /* Birthday Wishes */
+        .birthday-wishes {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 50px 0;
+            font-weight: bold;
+            background: linear-gradient(
+                90deg,
+                #ffd89b,
+                var(--cosmic-accent),
+                var(--cosmic-glow),
+                var(--cosmic-accent),
+                #ffd89b
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+            opacity: 0;
+        }
+
+        .birthday-wishes.visible {
+            animation: fadeInScale 1s forwards, shimmer 4s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5em; }
+            .letter { padding: 30px 20px; }
+            
+            .memories {
+                max-width: 350px;
+                min-height: 300px;
+            }
+            
+            .memory-container {
+                height: 300px;
+            }
+
+            .perf-stats {
+                font-size: 8px;
+                padding: 8px;
+            }
+        }
+
+        @media print {
+            * { animation: none !important; }
+            .perf-stats { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Performance Stats -->
+    <div class="perf-stats" id="perfStats">
+        <div><span class="metric">FPS:</span> <span class="value" id="fps">60</span></div>
+        <div><span class="metric">Particles:</span> <span class="value" id="particleCount">0</span></div>
+        <div><span class="metric">Memory:</span> <span class="value" id="memUsage">Loading...</span></div>
+        <div><span class="metric">Vec2 Pool:</span> <span class="value" id="poolStats">0/0</span></div>
+        <div><span class="metric">Mode:</span> <span class="value" id="renderMode">Init...</span></div>
+        <div><span class="metric">Reduction:</span> <span class="value" id="reductionFactor">1.00</span></div>
+    </div>
+
+    <!-- Entry Overlay -->
+    <div class="entry-overlay" id="entryOverlay">
+        <div class="entry-content">
+            <h2 class="entry-title">A Cosmic Birthday Journey</h2>
+            <p class="entry-subtitle">Celebrating you among the stars</p>
+            <button class="enter-button">Enter & Celebrate</button>
+        </div>
+    </div>
+
+    <!-- Optimized Canvas Layers -->
+    <canvas id="starCanvas"></canvas>
+    <canvas id="orbCanvas"></canvas>
+    <canvas id="trailCanvas"></canvas>
+    <canvas id="sparkleCanvas"></canvas>
+
+    <div class="container" id="mainContainer">
+        <h1>A Birthday special/h1>
+        
+        <!-- Birthday Date Display -->
+        <div class="birthday-date">
+            <div class="day">🎂 Happy Birthday 🎂</div>
+            <div class="message">Today, the universe celebrates you</div>
+        </div>
+        
+        <!-- Audio Player -->
+        <div class="audio-container">
+            <span class="audio-label">♪ Pisces - Tony Ann (Piano Cover) ♪</span>
+            <span class="audio-subtitle">A melody for your special day</span>
+            <div class="audio-visual" id="audioVisual">
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+            </div>
+            <audio id="bgMusic" loop>
+                <source src="Pisces - Tony Ann (Piano Cover).mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <!-- Single Center Image -->
+        <div class="memories">
+            <div class="memory-container">
+                <div class="memory" data-tilt>
+                    <img src="PHOTO" alt="The center of my universe" loading="lazy">
+                </div>
+            </div>
+        </div>
+
+        <h2>A Thought</h2>
+
+        <div class="letter" id="letter">
+            <p>Uta, on this day when the cosmos aligned to bring you into existence, I want you to know that your presence in this world—and in my life—is nothing short of extraordinary. You are a constellation of qualities that illuminate the darkness, a radiance that transforms ordinary moments into something cosmic and profound.</p>
+
+            <p>Your beauty isn't merely what eyes can perceive, though that alone takes my breath away. It's in the essence of who you are—the warmth that radiates from your spirit, the kindness that flows as naturally as starlight across the void, the strength that anchors you even when storms gather. I see all of it, every facet, every dimension, and I am endlessly grateful to witness the universe through your presence.</p>
+
+            <p>Every day with you is a celebration, but today holds special significance. Today marks another rotation around the sun, another year of your light brightening this world. Today, I want you to feel <em>cherished</em>, to feel <em>valued</em>, to feel <em>loved</em> in a way that transcends words typed on screens or whispered through the digital cosmos.</p>
+
+            <p>You deserve the universe laid at your feet—galaxies of joy, nebulae of laughter, constellations of dreams realized. You deserve mornings painted with gold and evenings wrapped in stardust. You deserve every good thing this existence has to offer, and I hope this year brings you closer to everything your heart desires.</p>
+
+            <p>Your passions, your dreams, your unique way of seeing the world—they all contribute to the beautiful soul you are. The way you pursue what brings you joy, the care you show to those around you, the gentle strength that defines you—these are the things that make you irreplaceable, unrepeatable, absolutely <em>you</em>.</p>
+
+            <p>As you stand at this moment, another year wiser and more radiant, I want you to know that you are loved not for what you do or what you achieve, but simply for <em>being</em>. Your existence alone is a gift, a cosmic event worth celebrating across all the stars in the sky.</p>
+
+            <p>May this year bring you adventures that ignite your spirit, quiet moments that bring you peace, laughter that echoes through your days, and love that wraps around you like a warm embrace. May you discover new facets of yourself, reach new heights in your journey, and find joy in both grand moments and simple pleasures.</p>
+
+            <p>Happy birthday. Today, the universe celebrates you, and so do I—with every beat of my heart, with every thought that drifts toward you, with every hope I hold for your happiness. You are extraordinary, you are cherished, and you are deeply, profoundly loved.</p>
+        </div>
+
+        <div class="birthday-wishes" id="birthdayWishes">
+            With all my love, on your special day and always. ✨🎂💜
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // ============================================================
+        // OPTIMIZED COSMIC BIRTHDAY - UNIVERSAL DEVICE SUPPORT
+        // ============================================================
+
+        /**
+         * Performance Monitor
+         */
+        const PerfMonitor = (() => {
+            let frameCount = 0;
+            let lastTime = performance.now();
+            let fps = 60;
+            let fpsHistory = [];
+            
+            return Object.freeze({
+                update: () => {
+                    frameCount++;
+                    const now = performance.now();
+                    if (now >= lastTime + 1000) {
+                        fps = Math.round((frameCount * 1000) / (now - lastTime));
+                        fpsHistory.push(fps);
+                        if (fpsHistory.length > 10) fpsHistory.shift();
+                        
+                        frameCount = 0;
+                        lastTime = now;
+                        
+                        const fpsEl = document.getElementById('fps');
+                        if (fpsEl) fpsEl.textContent = fps;
+                    }
+                },
+                getFPS: () => fps,
+                getAvgFPS: () => {
+                    if (fpsHistory.length === 0) return 60;
+                    return fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+                }
+            });
+        })();
+
+        /**
+         * Memory usage monitor
+         */
+        function getMemoryUsage() {
+            if (performance.memory) {
+                const used = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                const total = Math.round(performance.memory.totalJSHeapSize / 1048576);
+                return `${used}/${total} MB`;
+            }
+            return 'N/A';
+        }
+
+        /**
+         * Update performance stat display
+         */
+        function updatePerfStat(id, value, className = 'value') {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+                el.className = className;
+            }
+        }
+
+        /**
+         * Immutable state container
+         */
+        const createState = (initialState) => {
+            let state = Object.freeze({ ...initialState });
+            const subscribers = new Set();
+            
+            return Object.freeze({
+                get: () => state,
+                
+                update: (updater) => {
+                    const newState = Object.freeze({
+                        ...state,
+                        ...(typeof updater === 'function' ? updater(state) : updater)
+                    });
+                    state = newState;
+                    subscribers.forEach(fn => fn(newState));
+                    return newState;
+                },
+                
+                subscribe: (fn) => {
+                    subscribers.add(fn);
+                    return () => subscribers.delete(fn);
+                },
+                
+                getField: (field) => state[field]
+            });
+        };
+
+        /**
+         * Vec2 class for 2D vector operations
+         */
+        class Vec2 {
+            constructor(x = 0, y = 0) {
+                this.x = x;
+                this.y = y;
+            }
+
+            set(x, y) {
+                this.x = x;
+                this.y = y;
+                return this;
+            }
+
+            lengthSq() {
+                return this.x * this.x + this.y * this.y;
+            }
+        }
+
+        /**
+         * Vec2 Object Pool
+         */
+        class Vec2Pool {
+            constructor(initialSize = 1000) {
+                this.pool = new Array(initialSize).fill(null).map(() => new Vec2());
+                this.used = 0;
+                this.maxSize = 5000;
+            }
+
+            acquire(x = 0, y = 0) {
+                if (this.used >= this.pool.length) {
+                    if (this.pool.length < this.maxSize) {
+                        this.pool.push(new Vec2(x, y));
+                    } else {
+                        this.used = 0;
+                    }
+                }
+                const vec = this.pool[this.used++];
+                vec.x = x;
+                vec.y = y;
+                return vec;
+            }
+
+            release(vec) {
+                if (this.used > 0) this.used--;
+            }
+
+            releaseAll() {
+                this.used = 0;
+            }
+
+            getStats() {
+                return {
+                    used: this.used,
+                    available: this.pool.length - this.used,
+                    total: this.pool.length
+                };
+            }
+        }
+
+        const vec2Pool = new Vec2Pool(1000);
+
+        /**
+         * Optimized particle system
+         */
+        const createParticleSystem = (maxParticles) => {
+            const positions = new Float32Array(maxParticles * 2);
+            const velocities = new Float32Array(maxParticles * 2);
+            const lifetimes = new Float32Array(maxParticles);
+            const maxLifetimes = new Float32Array(maxParticles);
+            const sizes = new Float32Array(maxParticles);
+            
+            let count = 0;
+            
+            const spawn = (x, y, vx, vy, lifetime, size) => {
+                if (count >= maxParticles) {
+                    count = Math.floor(maxParticles * 0.9);
+                }
+                
+                const idx = count++;
+                const idx2 = idx * 2;
+                
+                positions[idx2] = x;
+                positions[idx2 + 1] = y;
+                velocities[idx2] = vx;
+                velocities[idx2 + 1] = vy;
+                lifetimes[idx] = lifetime;
+                maxLifetimes[idx] = lifetime;
+                sizes[idx] = size;
+                
+                return idx;
+            };
+            
+            const update = (dt, gravity = 0, width = 0, height = 0) => {
+                let writeIdx = 0;
+                
+                for (let i = 0; i < count; i++) {
+                    const idx2 = i * 2;
+                    
+                    velocities[idx2 + 1] += gravity * dt;
+                    positions[idx2] += velocities[idx2] * dt;
+                    positions[idx2 + 1] += velocities[idx2 + 1] * dt;
+                    
+                    if (width > 0 && height > 0) {
+                        positions[idx2] = Math.max(0, Math.min(width, positions[idx2]));
+                        positions[idx2 + 1] = Math.max(0, Math.min(height, positions[idx2 + 1]));
+                    }
+                    
+                    lifetimes[i] -= dt;
+                    
+                    if (lifetimes[i] <= 0) continue;
+                    
+                    if (i !== writeIdx) {
+                        const wi2 = writeIdx * 2;
+                        positions[wi2] = positions[idx2];
+                        positions[wi2 + 1] = positions[idx2 + 1];
+                        velocities[wi2] = velocities[idx2];
+                        velocities[wi2 + 1] = velocities[idx2 + 1];
+                        lifetimes[writeIdx] = lifetimes[i];
+                        maxLifetimes[writeIdx] = maxLifetimes[i];
+                        sizes[writeIdx] = sizes[i];
+                    }
+                    
+                    writeIdx++;
+                }
+                
+                count = writeIdx;
+            };
+            
+            return Object.freeze({
+                spawn,
+                update,
+                getCount: () => count,
+                getPositions: () => positions,
+                getVelocities: () => velocities,
+                getLifetimes: () => lifetimes,
+                getMaxLifetimes: () => maxLifetimes,
+                getSizes: () => sizes,
+                clear: () => { count = 0; }
+            });
+        };
+
+        /**
+         * High-performance throttle
+         */
+        const throttle = (fn, delay) => {
+            let lastCall = 0;
+            return (...args) => {
+                const now = performance.now();
+                if (now - lastCall >= delay) {
+                    lastCall = now;
+                    fn(...args);
+                }
+            };
+        };
+
+        /**
+         * RAF-based debounce
+         */
+        const rafDebounce = (fn) => {
+            let rafId = null;
+            return (...args) => {
+                if (rafId !== null) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    rafId = null;
+                    fn(...args);
+                });
+            };
+        };
+
+        /**
+         * Canvas renderer
+         */
+        const createRenderer = (canvasId, options = {}) => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return null;
+            
+            const ctx = canvas.getContext('2d', {
+                alpha: options.alpha ?? true,
+                desynchronized: true,
+                willReadFrequently: false
+            });
+            
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            
+            const resize = () => {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = `${width}px`;
+                canvas.style.height = `${height}px`;
+                
+                ctx.scale(dpr, dpr);
+                
+                return { width, height };
+            };
+            
+            const clear = () => {
+                ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+            };
+            
+            return Object.freeze({
+                canvas,
+                ctx,
+                resize,
+                clear,
+                getDimensions: () => ({
+                    width: canvas.width / dpr,
+                    height: canvas.height / dpr
+                })
+            });
+        };
+
+        // ============================================================
+        // MAIN APPLICATION
+        // ============================================================
+
+        const CosmicBirthday = (() => {
+            const state = createState({
+                mouseX: window.innerWidth / 2,
+                mouseY: window.innerHeight / 2,
+                scrollProgress: 0,
+                time: 0,
+                isPlaying: false,
+                canvasReady: false,
+                isPaused: false,
+                reductionFactor: 1.0,
+                isTouchDevice: false
+            });
+            
+            const renderers = new Map();
+            
+            const sparkles = createParticleSystem(500);
+            const trails = createParticleSystem(300);
+            const orbs = createParticleSystem(50);
+            
+            const STAR_COUNT = 200;
+            const stars = new Float32Array(STAR_COUNT * 5);
+            const orbVelocities = new Float32Array(50 * 2);
+            
+            const initStars = () => {
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    const idx = i * 5;
+                    stars[idx] = Math.random();
+                    stars[idx + 1] = Math.random();
+                    stars[idx + 2] = Math.random() * 2 + 0.5;
+                    stars[idx + 3] = Math.random() * 0.0005 + 0.0001;
+                    stars[idx + 4] = Math.random() * Math.PI * 2;
+                }
+            };
+            
+            const initRenderers = () => {
+                const starRenderer = createRenderer('starCanvas', { alpha: false });
+                if (starRenderer) {
+                    starRenderer.resize();
+                    renderers.set('starCanvas', starRenderer);
+                }
+                
+                ['sparkleCanvas', 'trailCanvas', 'orbCanvas'].forEach(id => {
+                    const renderer = createRenderer(id, { alpha: true });
+                    if (renderer) {
+                        renderer.resize();
+                        renderers.set(id, renderer);
+                    }
+                });
+                
+                updatePerfStat('renderMode', 'Optimized', 'good');
+            };
+            
+            const renderStars = (dt) => {
+                const renderer = renderers.get('starCanvas');
+                if (!renderer) return;
+                
+                const { ctx } = renderer;
+                const { width, height } = renderer.getDimensions();
+                const currentState = state.get();
+                
+                renderer.clear();
+                
+                const gradient = ctx.createRadialGradient(
+                    currentState.mouseX, currentState.mouseY, 0,
+                    width / 2, height / 2, width
+                );
+                gradient.addColorStop(0, `rgba(138, 43, 226, ${0.02 + currentState.scrollProgress * 0.03})`);
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+                
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    const idx = i * 5;
+                    const x = stars[idx] * width;
+                    const y = stars[idx + 1] * height;
+                    const size = stars[idx + 2];
+                    const phase = stars[idx + 4];
+                    
+                    const parallax = size > 1 ? 0.5 : 0.3;
+                    const offsetX = (currentState.mouseX / width - 0.5) * parallax * 50;
+                    const offsetY = (currentState.mouseY / height - 0.5) * parallax * 50;
+                    
+                    const brightness = Math.sin(phase) * 0.5 + 0.5;
+                    ctx.globalAlpha = brightness * 0.8 + 0.2;
+                    
+                    ctx.moveTo(x + offsetX + size, y + offsetY);
+                    ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
+                    
+                    stars[idx + 4] += stars[idx + 3] * dt * 1000;
+                }
+                
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            };
+            
+            const createSparkles = (x, y) => {
+                const currentState = state.get();
+                const effectiveCount = Math.floor(5 * currentState.reductionFactor);
+                
+                for (let i = 0; i < effectiveCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 50 + 25;
+                    
+                    const vel = vec2Pool.acquire(
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed
+                    );
+                    
+                    sparkles.spawn(x, y, vel.x, vel.y, Math.random() * 0.5 + 0.3, Math.random() * 3 + 1);
+                    vec2Pool.release(vel);
+                }
+            };
+            
+            const renderSparkles = (dt) => {
+                const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
+                
+                sparkles.update(dt, 100, width, height);
+                
+                const renderer = renderers.get('sparkleCanvas');
+                if (!renderer) return;
+                
+                const { ctx } = renderer;
+                renderer.clear();
+                
+                const positions = sparkles.getPositions();
+                const lifetimes = sparkles.getLifetimes();
+                const maxLifetimes = sparkles.getMaxLifetimes();
+                const sizes = sparkles.getSizes();
+                const count = sparkles.getCount();
+                
+                for (let i = 0; i < count; i++) {
+                    const idx2 = i * 2;
+                    const x = positions[idx2];
+                    const y = positions[idx2 + 1];
+                    const life = lifetimes[i] / maxLifetimes[i];
+                    const size = sizes[i];
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${life})`);
+                    gradient.addColorStop(0.5, `rgba(183, 148, 246, ${life * 0.5})`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x - size * 3, y - size * 3, size * 6, size * 6);
+                }
+            };
+            
+            const createTrail = (x, y) => {
+                const currentState = state.get();
+                if (Math.random() < currentState.reductionFactor) {
+                    const vel = vec2Pool.acquire(
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20
+                    );
+                    trails.spawn(x, y, vel.x, vel.y, 1.5, 2);
+                    vec2Pool.release(vel);
+                }
+            };
+            
+            const renderTrails = (dt) => {
+                const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
+                
+                trails.update(dt, 0, width, height);
+                
+                const renderer = renderers.get('trailCanvas');
+                if (!renderer) return;
+                
+                const { ctx } = renderer;
+                renderer.clear();
+                
+                const positions = trails.getPositions();
+                const lifetimes = trails.getLifetimes();
+                const maxLifetimes = trails.getMaxLifetimes();
+                const count = trails.getCount();
+                
+                ctx.globalCompositeOperation = 'lighter';
+                
+                for (let i = 0; i < count; i++) {
+                    const idx2 = i * 2;
+                    const x = positions[idx2];
+                    const y = positions[idx2 + 1];
+                    const life = lifetimes[i] / maxLifetimes[i];
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 8);
+                    gradient.addColorStop(0, `rgba(183, 148, 246, ${life * 0.6})`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x - 8, y - 8, 16, 16);
+                }
+                
+                ctx.globalCompositeOperation = 'source-over';
+            };
+            
+            const initOrbs = () => {
+                const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
+                
+                orbs.clear();
+                
+                for (let i = 0; i < 30; i++) {
+                    const pos = vec2Pool.acquire(Math.random() * width, Math.random() * height);
+                    orbs.spawn(pos.x, pos.y, 0, 0, Infinity, Math.random() * 30 + 10);
+                    vec2Pool.release(pos);
+                    
+                    const idx2 = i * 2;
+                    orbVelocities[idx2] = (Math.random() - 0.5) * 20;
+                    orbVelocities[idx2 + 1] = (Math.random() - 0.5) * 20;
+                }
+            };
+            
+            const renderOrbs = (dt) => {
+                const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
+                const currentState = state.get();
+                
+                const positions = orbs.getPositions();
+                const sizes = orbs.getSizes();
+                const count = orbs.getCount();
+                
+                const mousePos = vec2Pool.acquire(currentState.mouseX, currentState.mouseY);
+                
+                for (let i = 0; i < count; i++) {
+                    const idx2 = i * 2;
+                    
+                    const dx = mousePos.x - positions[idx2];
+                    const dy = mousePos.y - positions[idx2 + 1];
+                    const distSq = dx * dx + dy * dy;
+                    const threshold = 200 * 200;
+                    
+                    if (distSq > 0 && distSq < threshold) {
+                        const force = (threshold - distSq) / (threshold * 10);
+                        orbVelocities[idx2] += dx * force;
+                        orbVelocities[idx2 + 1] += dy * force;
+                    }
+                    
+                    orbVelocities[idx2] *= 0.98;
+                    orbVelocities[idx2 + 1] *= 0.98;
+                    
+                    positions[idx2] += orbVelocities[idx2] * dt;
+                    positions[idx2 + 1] += orbVelocities[idx2 + 1] * dt;
+                    
+                    const size = sizes[i];
+                    if (positions[idx2] < -size) {
+                        positions[idx2] = width + size;
+                        orbVelocities[idx2] *= 0.5;
+                    }
+                    if (positions[idx2] > width + size) {
+                        positions[idx2] = -size;
+                        orbVelocities[idx2] *= 0.5;
+                    }
+                    if (positions[idx2 + 1] < -size) {
+                        positions[idx2 + 1] = height + size;
+                        orbVelocities[idx2 + 1] *= 0.5;
+                    }
+                    if (positions[idx2 + 1] > height + size) {
+                        positions[idx2 + 1] = -size;
+                        orbVelocities[idx2 + 1] *= 0.5;
+                    }
+                }
+                
+                vec2Pool.release(mousePos);
+                
+                const renderer = renderers.get('orbCanvas');
+                if (!renderer) return;
+                
+                const { ctx } = renderer;
+                renderer.clear();
+                
+                ctx.globalCompositeOperation = 'lighter';
+                
+                const hue = 270 + Math.sin(currentState.time * 2) * 30;
+                
+                for (let i = 0; i < count; i++) {
+                    const idx2 = i * 2;
+                    const x = positions[idx2];
+                    const y = positions[idx2 + 1];
+                    const size = sizes[i];
+                    const orbHue = hue + i * 5;
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, `hsla(${orbHue}, 70%, 60%, 0.3)`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x - size, y - size, size * 2, size * 2);
+                }
+                
+                ctx.globalCompositeOperation = 'source-over';
+            };
+            
+            const autoOptimize = () => {
+                const avgFPS = PerfMonitor.getAvgFPS();
+                const currentReduction = state.get().reductionFactor;
+                let newReduction = currentReduction;
+                
+                if (avgFPS < 35) {
+                    newReduction = Math.max(0.3, currentReduction - 0.15);
+                } else if (avgFPS > 55 && currentReduction < 1) {
+                    newReduction = Math.min(1, currentReduction + 0.05);
+                }
+                
+                if (newReduction !== currentReduction) {
+                    state.update({ reductionFactor: newReduction });
+                    
+                    if (newReduction < 1) {
+                        const sparkleLifetimes = sparkles.getLifetimes();
+                        const trailLifetimes = trails.getLifetimes();
+                        const orbLifetimes = orbs.getLifetimes();
+                        
+                        const cullCount = Math.floor(50 * (1 - newReduction));
+                        for (let i = 0; i < cullCount; i++) {
+                            if (i < sparkleLifetimes.length) sparkleLifetimes[i] = 0;
+                            if (i < trailLifetimes.length) trailLifetimes[i] = 0;
+                            if (i < orbLifetimes.length) orbLifetimes[i] = 0;
+                        }
+                    }
+                    
+                    updatePerfStat('reductionFactor', newReduction.toFixed(2), 
+                        newReduction >= 0.9 ? 'good' : newReduction >= 0.6 ? 'value' : 'warning');
+                }
+            };
+            
+            const handlePointerMove = throttle((x, y) => {
+                state.update({ mouseX: x, mouseY: y });
+                
+                document.documentElement.style.setProperty('--mouse-x', `${(x / window.innerWidth) * 100}%`);
+                document.documentElement.style.setProperty('--mouse-y', `${(y / window.innerHeight) * 100}%`);
+                
+                if (Math.random() > 0.7) {
+                    createSparkles(x, y);
+                }
+                createTrail(x, y);
+            }, 16);
+            
+            const handleMouseMove = (e) => {
+                handlePointerMove(e.clientX, e.clientY);
+            };
+            
+            const handleTouchMove = (e) => {
+                e.preventDefault();
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    handlePointerMove(touch.clientX, touch.clientY);
+                }
+            };
+            
+            const handleTouchStart = (e) => {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    createSparkles(touch.clientX, touch.clientY);
+                }
+            };
+            
+            const handleClick = (e) => {
+                createSparkles(e.clientX, e.clientY);
+            };
+            
+            const handleScroll = rafDebounce(() => {
+                const scrolled = window.pageYOffset;
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = maxScroll > 0 ? Math.min(scrolled / maxScroll, 1) : 0;
+                
+                state.update({ scrollProgress: progress });
+                
+                document.documentElement.style.setProperty('--scroll-progress', progress);
+                document.documentElement.style.setProperty('--hue-shift', progress * 20);
+            });
+            
+            const handleResize = rafDebounce(() => {
+                state.update({ isPaused: true });
+                
+                const oldDims = renderers.get('starCanvas')?.getDimensions();
+                
+                renderers.forEach(renderer => renderer.resize());
+                
+                const newDims = renderers.get('starCanvas')?.getDimensions();
+                if (oldDims && newDims) {
+                    const scaleX = newDims.width / oldDims.width;
+                    const scaleY = newDims.height / oldDims.height;
+                    
+                    const orbPos = orbs.getPositions();
+                    const orbCount = orbs.getCount();
+                    for (let i = 0; i < orbCount; i++) {
+                        orbPos[i * 2] *= scaleX;
+                        orbPos[i * 2 + 1] *= scaleY;
+                    }
+                }
+                
+                setTimeout(() => state.update({ isPaused: false }), 100);
+            });
+            
+            const setupIntersectionObserver = () => {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('visible');
+                            }
+                        });
+                    },
+                    { threshold: [0.1, 0.5], rootMargin: '0px' }
+                );
+                
+                ['#letter', '#birthdayWishes'].forEach(selector => {
+                    const el = document.querySelector(selector);
+                    if (el) observer.observe(el);
+                });
+            };
+            
+            const setupMemoryTilt = () => {
+                const memories = document.querySelectorAll('.memory[data-tilt]');
+                
+                memories.forEach(memory => {
+                    const handleTilt = throttle((x, y) => {
+                        const rect = memory.getBoundingClientRect();
+                        const relX = (x - rect.left) / rect.width - 0.5;
+                        const relY = (y - rect.top) / rect.height - 0.5;
+                        
+                        const scale = 1.05;
+                        const translateZ = 50;
+                        
+                        memory.style.transform = `
+                            translateZ(${translateZ}px)
+                            rotateY(${relX * 20}deg)
+                            rotateX(${-relY * 20}deg)
+                            scale(${scale})
+                        `;
+                    }, 16);
+                    
+                    memory.addEventListener('mousemove', (e) => {
+                        handleTilt(e.clientX, e.clientY);
+                    }, { passive: true });
+                    
+                    memory.addEventListener('touchmove', (e) => {
+                        if (e.touches.length > 0) {
+                            const touch = e.touches[0];
+                            handleTilt(touch.clientX, touch.clientY);
+                        }
+                    }, { passive: true });
+                    
+                    const resetTilt = () => {
+                        memory.style.transform = 'translateZ(0) rotateY(0) rotateX(0) scale(1)';
+                    };
+                    
+                    memory.addEventListener('mouseleave', resetTilt);
+                    memory.addEventListener('touchend', resetTilt);
+                });
+            };
+            
+            const setupImageErrorHandling = () => {
+                const images = document.querySelectorAll('.memory img');
+                images.forEach(img => {
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        this.parentElement.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    };
+                });
+            };
+            
+            const setupAudioErrorHandling = () => {
+                const audio = document.getElementById('bgMusic');
+                if (audio) {
+                    audio.onerror = function() {
+                        const audioBars = document.querySelectorAll('.audio-bar');
+                        audioBars.forEach(bar => bar.classList.remove('playing'));
+                        
+                        const subtitle = document.querySelector('.audio-subtitle');
+                        if (subtitle) {
+                            subtitle.textContent = '(Audio unavailable)';
+                            subtitle.style.color = 'rgba(255, 100, 100, 0.7)';
+                        }
+                    };
+                }
+            };
+            
+            const detectTouchDevice = () => {
+                const isTouchDevice = (
+                    ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0) ||
+                    (navigator.msMaxTouchPoints > 0)
+                );
+                state.update({ isTouchDevice });
+                return isTouchDevice;
+            };
+            
+            let lastTime = performance.now();
+            let animationId = null;
+            let frameSkipCount = 0;
+            
+            const animate = (currentTime) => {
+                animationId = requestAnimationFrame(animate);
+                
+                const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+                lastTime = currentTime;
+                
+                PerfMonitor.update();
+                
+                if (frameSkipCount++ % 30 === 0) {
+                    autoOptimize();
+                    
+                    const totalParticles = sparkles.getCount() + trails.getCount() + orbs.getCount();
+                    updatePerfStat('particleCount', totalParticles);
+                    
+                    const poolStats = vec2Pool.getStats();
+                    updatePerfStat('poolStats', `${poolStats.used}/${poolStats.total}`);
+                    
+                    updatePerfStat('memUsage', getMemoryUsage());
+                }
+                
+                const fps = PerfMonitor.getFPS();
+                if (fps < 25 && frameSkipCount % 2 === 0) return;
+                
+                if (state.get().isPaused) return;
+                
+                state.update(s => ({ time: s.time + dt }));
+                
+                renderStars(dt);
+                renderSparkles(dt);
+                renderTrails(dt);
+                renderOrbs(dt);
+                
+                if (frameSkipCount % 60 === 0) {
+                    vec2Pool.releaseAll();
+                }
+            };
+            
+            const startExperience = async () => {
+                const entryOverlay = document.getElementById('entryOverlay');
+                const mainContainer = document.getElementById('mainContainer');
+                const bgMusic = document.getElementById('bgMusic');
+                const audioBars = document.querySelectorAll('.audio-bar');
+                
+                entryOverlay.classList.add('hidden');
+                
+                ['starCanvas', 'sparkleCanvas', 'trailCanvas', 'orbCanvas'].forEach(id => {
+                    const canvas = document.getElementById(id);
+                    if (canvas) canvas.classList.add('visible');
+                });
+                
+                if (bgMusic) {
+                    try {
+                        await bgMusic.play();
+                        state.update({ isPlaying: true });
+                        audioBars.forEach(bar => bar.classList.add('playing'));
+                    } catch (e) {
+                        const retryPlay = () => {
+                            bgMusic.play()
+                                .then(() => {
+                                    state.update({ isPlaying: true });
+                                    audioBars.forEach(bar => bar.classList.add('playing'));
+                                })
+                                .catch(() => {});
+                        };
+                        
+                        document.addEventListener('click', retryPlay, { once: true, passive: true });
+                        document.addEventListener('touchstart', retryPlay, { once: true, passive: true });
+                    }
+                }
+                
+                setTimeout(() => {
+                    mainContainer.classList.add('visible');
+                    setupIntersectionObserver();
+                }, 500);
+                
+                animationId = requestAnimationFrame(animate);
+            };
+            
+            const init = () => {
+                initStars();
+                initRenderers();
+                initOrbs();
+                
+                detectTouchDevice();
+                
+                // Universal pointer event handling
+                document.addEventListener('mousemove', handleMouseMove, { passive: true });
+                document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                document.addEventListener('touchstart', handleTouchStart, { passive: true });
+                document.addEventListener('click', handleClick, { passive: true });
+                
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                window.addEventListener('resize', handleResize);
+                
+                const enterBtn = document.querySelector('.enter-button');
+                if (enterBtn) {
+                    enterBtn.addEventListener('click', startExperience);
+                    enterBtn.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        startExperience();
+                    });
+                }
+                
+                setupMemoryTilt();
+                setupImageErrorHandling();
+                setupAudioErrorHandling();
+                
+                state.update({ canvasReady: true });
+            };
+            
+            const cleanup = () => {
+                if (animationId) cancelAnimationFrame(animationId);
+                vec2Pool.releaseAll();
+            };
+            
+            window.addEventListener('beforeunload', cleanup);
+            
+            return Object.freeze({
+                init,
+                getState: () => state.get(),
+                cleanup
+            });
+        })();
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', CosmicBirthday.init);
+        } else {
+            CosmicBirthday.init();
+        }
+    </script>
+</body>
+</html>

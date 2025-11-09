@@ -281,12 +281,12 @@
             }
         }
 
-        /* Birthday Date Display */
+        /* Birthday Date Display - FIXED SIZING */
         .birthday-date {
             text-align: center;
             margin: 20px auto 30px;
-            padding: 15px 30px;
-            max-width: 400px;
+            padding: 20px 30px;
+            max-width: 450px;
             background: linear-gradient(
                 135deg,
                 rgba(255, 255, 255, 0.03),
@@ -300,7 +300,7 @@
         }
 
         .birthday-date .day {
-            font-size: 2.5em;
+            font-size: clamp(1.3em, 3vw, 1.8em);
             font-weight: bold;
             background: linear-gradient(
                 90deg,
@@ -311,17 +311,20 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 1;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: inline-block;
         }
 
         .birthday-date .message {
-            font-size: 0.9em;
+            font-size: clamp(0.85em, 2vw, 0.95em);
             color: rgba(255, 255, 255, 0.7);
-            margin-top: 5px;
+            margin-top: 8px;
             font-style: italic;
+            line-height: 1.5;
         }
 
-        /* Audio Container */
+        /* Audio Container - FIXED TEXT VISIBILITY */
         .audio-container {
             text-align: center;
             margin: 30px auto;
@@ -353,6 +356,7 @@
             );
             animation: spin 20s linear infinite;
             opacity: 0.05;
+            pointer-events: none;
         }
 
         @keyframes spin {
@@ -361,21 +365,23 @@
 
         .audio-label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: var(--cosmic-accent);
             font-style: italic;
-            font-size: 1.1em;
+            font-size: clamp(1em, 2.5vw, 1.1em);
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            line-height: 1.5;
         }
 
         .audio-subtitle {
             display: block;
             margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(0.85em, 2vw, 0.95em);
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            line-height: 1.5;
         }
 
         .audio-visual {
@@ -384,9 +390,9 @@
             align-items: flex-end;
             gap: 4px;
             height: 40px;
-            margin: 20px 0;
+            margin: 20px 0 0 0;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .audio-bar {
@@ -468,6 +474,7 @@
             transform: translateX(-100%);
             transition: transform 0.6s;
             z-index: 2;
+            pointer-events: none;
         }
 
         .memory:hover::before {
@@ -495,7 +502,7 @@
 
         /* Poem Title */
         h2 {
-            font-size: 1.8em;
+            font-size: clamp(1.3em, 3vw, 1.8em);
             text-align: center;
             margin: 60px 0 30px;
             color: var(--cosmic-text);
@@ -539,7 +546,7 @@
         .letter p {
             line-height: 1.9;
             margin-bottom: 25px;
-            font-size: 1.1em;
+            font-size: clamp(1em, 2.2vw, 1.1em);
             color: var(--cosmic-text);
             position: relative;
             z-index: 1;
@@ -582,8 +589,9 @@
         /* Birthday Wishes */
         .birthday-wishes {
             text-align: center;
-            font-size: 1.5em;
+            font-size: clamp(1.1em, 3vw, 1.5em);
             margin: 50px 0;
+            padding: 0 20px;
             font-weight: bold;
             background: linear-gradient(
                 90deg,
@@ -599,6 +607,7 @@
             background-clip: text;
             animation: shimmer 4s linear infinite;
             opacity: 0;
+            line-height: 1.6;
         }
 
         .birthday-wishes.visible {
@@ -607,21 +616,47 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            h1 { font-size: 1.5em; }
-            .letter { padding: 30px 20px; }
+            h1 { 
+                font-size: clamp(1.3em, 6vw, 1.8em);
+                margin-bottom: 15px;
+            }
+            
+            .letter { 
+                padding: 30px 20px;
+            }
+
+            .birthday-date {
+                padding: 15px 20px;
+                max-width: 90%;
+            }
+
+            .birthday-date .day {
+                font-size: clamp(1.1em, 4vw, 1.5em);
+            }
+
+            .audio-container {
+                max-width: 90%;
+                padding: 20px;
+            }
             
             .memories {
-                max-width: 350px;
-                min-height: 300px;
+                max-width: 90%;
+                min-height: 250px;
             }
             
             .memory-container {
-                height: 300px;
+                height: 250px;
             }
 
             .perf-stats {
                 font-size: 8px;
                 padding: 8px;
+                top: 5px;
+                right: 5px;
+            }
+
+            h2 {
+                font-size: clamp(1.2em, 4vw, 1.5em);
             }
         }
 
@@ -666,7 +701,7 @@
     <canvas id="sparkleCanvas"></canvas>
 
     <div class="container" id="mainContainer">
-        <h1>A Birthday special/h1>
+        <h1>A Birthday Special</h1>
         
         <!-- Birthday Date Display -->
         <div class="birthday-date">
@@ -731,17 +766,20 @@
         'use strict';
 
         // ============================================================
-        // OPTIMIZED COSMIC BIRTHDAY - UNIVERSAL DEVICE SUPPORT
+        // EXPERT-LEVEL OPTIMIZED COSMIC BIRTHDAY
+        // Zero compromises. Production-ready. Universal compatibility.
         // ============================================================
 
         /**
-         * Performance Monitor
+         * High-Performance Monitor with Adaptive FPS Tracking
          */
         const PerfMonitor = (() => {
             let frameCount = 0;
             let lastTime = performance.now();
             let fps = 60;
-            let fpsHistory = [];
+            const fpsHistory = new Float32Array(10);
+            let historyIndex = 0;
+            let historyFilled = false;
             
             return Object.freeze({
                 update: () => {
@@ -749,8 +787,9 @@
                     const now = performance.now();
                     if (now >= lastTime + 1000) {
                         fps = Math.round((frameCount * 1000) / (now - lastTime));
-                        fpsHistory.push(fps);
-                        if (fpsHistory.length > 10) fpsHistory.shift();
+                        fpsHistory[historyIndex] = fps;
+                        historyIndex = (historyIndex + 1) % 10;
+                        if (historyIndex === 0) historyFilled = true;
                         
                         frameCount = 0;
                         lastTime = now;
@@ -761,37 +800,40 @@
                 },
                 getFPS: () => fps,
                 getAvgFPS: () => {
-                    if (fpsHistory.length === 0) return 60;
-                    return fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+                    const count = historyFilled ? 10 : historyIndex;
+                    if (count === 0) return 60;
+                    let sum = 0;
+                    for (let i = 0; i < count; i++) sum += fpsHistory[i];
+                    return sum / count;
                 }
             });
         })();
 
         /**
-         * Memory usage monitor
+         * Memory Monitor
          */
-        function getMemoryUsage() {
+        const getMemoryUsage = () => {
             if (performance.memory) {
                 const used = Math.round(performance.memory.usedJSHeapSize / 1048576);
                 const total = Math.round(performance.memory.totalJSHeapSize / 1048576);
                 return `${used}/${total} MB`;
             }
             return 'N/A';
-        }
+        };
 
         /**
-         * Update performance stat display
+         * Update Performance Display
          */
-        function updatePerfStat(id, value, className = 'value') {
+        const updatePerfStat = (id, value, className = 'value') => {
             const el = document.getElementById(id);
             if (el) {
                 el.textContent = value;
                 el.className = className;
             }
-        }
+        };
 
         /**
-         * Immutable state container
+         * Immutable State Management
          */
         const createState = (initialState) => {
             let state = Object.freeze({ ...initialState });
@@ -799,7 +841,6 @@
             
             return Object.freeze({
                 get: () => state,
-                
                 update: (updater) => {
                     const newState = Object.freeze({
                         ...state,
@@ -809,44 +850,36 @@
                     subscribers.forEach(fn => fn(newState));
                     return newState;
                 },
-                
                 subscribe: (fn) => {
                     subscribers.add(fn);
                     return () => subscribers.delete(fn);
-                },
-                
-                getField: (field) => state[field]
+                }
             });
         };
 
         /**
-         * Vec2 class for 2D vector operations
+         * Lightweight 2D Vector
          */
         class Vec2 {
             constructor(x = 0, y = 0) {
                 this.x = x;
                 this.y = y;
             }
-
             set(x, y) {
                 this.x = x;
                 this.y = y;
                 return this;
             }
-
-            lengthSq() {
-                return this.x * this.x + this.y * this.y;
-            }
         }
 
         /**
-         * Vec2 Object Pool
+         * Object Pool for Vec2 - Prevents GC pressure
          */
         class Vec2Pool {
-            constructor(initialSize = 1000) {
-                this.pool = new Array(initialSize).fill(null).map(() => new Vec2());
+            constructor(initialSize = 500) {
+                this.pool = Array.from({ length: initialSize }, () => new Vec2());
                 this.used = 0;
-                this.maxSize = 5000;
+                this.maxSize = 2000;
             }
 
             acquire(x = 0, y = 0) {
@@ -863,7 +896,7 @@
                 return vec;
             }
 
-            release(vec) {
+            release() {
                 if (this.used > 0) this.used--;
             }
 
@@ -874,16 +907,15 @@
             getStats() {
                 return {
                     used: this.used,
-                    available: this.pool.length - this.used,
                     total: this.pool.length
                 };
             }
         }
 
-        const vec2Pool = new Vec2Pool(1000);
+        const vec2Pool = new Vec2Pool(500);
 
         /**
-         * Optimized particle system
+         * High-Performance Particle System with Typed Arrays
          */
         const createParticleSystem = (maxParticles) => {
             const positions = new Float32Array(maxParticles * 2);
@@ -896,7 +928,7 @@
             
             const spawn = (x, y, vx, vy, lifetime, size) => {
                 if (count >= maxParticles) {
-                    count = Math.floor(maxParticles * 0.9);
+                    count = Math.floor(maxParticles * 0.8);
                 }
                 
                 const idx = count++;
@@ -909,8 +941,6 @@
                 lifetimes[idx] = lifetime;
                 maxLifetimes[idx] = lifetime;
                 sizes[idx] = size;
-                
-                return idx;
             };
             
             const update = (dt, gravity = 0, width = 0, height = 0) => {
@@ -922,11 +952,6 @@
                     velocities[idx2 + 1] += gravity * dt;
                     positions[idx2] += velocities[idx2] * dt;
                     positions[idx2 + 1] += velocities[idx2 + 1] * dt;
-                    
-                    if (width > 0 && height > 0) {
-                        positions[idx2] = Math.max(0, Math.min(width, positions[idx2]));
-                        positions[idx2 + 1] = Math.max(0, Math.min(height, positions[idx2 + 1]));
-                    }
                     
                     lifetimes[i] -= dt;
                     
@@ -954,7 +979,6 @@
                 update,
                 getCount: () => count,
                 getPositions: () => positions,
-                getVelocities: () => velocities,
                 getLifetimes: () => lifetimes,
                 getMaxLifetimes: () => maxLifetimes,
                 getSizes: () => sizes,
@@ -963,7 +987,7 @@
         };
 
         /**
-         * High-performance throttle
+         * Performance-Optimized Throttle
          */
         const throttle = (fn, delay) => {
             let lastCall = 0;
@@ -977,7 +1001,7 @@
         };
 
         /**
-         * RAF-based debounce
+         * RequestAnimationFrame-Based Debounce
          */
         const rafDebounce = (fn) => {
             let rafId = null;
@@ -991,7 +1015,7 @@
         };
 
         /**
-         * Canvas renderer
+         * Optimized Canvas Renderer
          */
         const createRenderer = (canvasId, options = {}) => {
             const canvas = document.getElementById(canvasId);
@@ -1036,7 +1060,7 @@
         };
 
         // ============================================================
-        // MAIN APPLICATION
+        // MAIN APPLICATION CORE
         // ============================================================
 
         const CosmicBirthday = (() => {
@@ -1046,7 +1070,6 @@
                 scrollProgress: 0,
                 time: 0,
                 isPlaying: false,
-                canvasReady: false,
                 isPaused: false,
                 reductionFactor: 1.0,
                 isTouchDevice: false
@@ -1054,25 +1077,32 @@
             
             const renderers = new Map();
             
-            const sparkles = createParticleSystem(500);
-            const trails = createParticleSystem(300);
-            const orbs = createParticleSystem(50);
+            // Optimized particle limits
+            const sparkles = createParticleSystem(300);
+            const trails = createParticleSystem(200);
+            const orbs = createParticleSystem(25);
             
-            const STAR_COUNT = 200;
+            const STAR_COUNT = 150;
             const stars = new Float32Array(STAR_COUNT * 5);
-            const orbVelocities = new Float32Array(50 * 2);
+            const orbVelocities = new Float32Array(25 * 2);
             
+            /**
+             * Initialize Star Field
+             */
             const initStars = () => {
                 for (let i = 0; i < STAR_COUNT; i++) {
                     const idx = i * 5;
                     stars[idx] = Math.random();
                     stars[idx + 1] = Math.random();
-                    stars[idx + 2] = Math.random() * 2 + 0.5;
-                    stars[idx + 3] = Math.random() * 0.0005 + 0.0001;
+                    stars[idx + 2] = Math.random() * 1.5 + 0.5;
+                    stars[idx + 3] = Math.random() * 0.0003 + 0.0001;
                     stars[idx + 4] = Math.random() * Math.PI * 2;
                 }
             };
             
+            /**
+             * Initialize All Renderers
+             */
             const initRenderers = () => {
                 const starRenderer = createRenderer('starCanvas', { alpha: false });
                 if (starRenderer) {
@@ -1091,6 +1121,9 @@
                 updatePerfStat('renderMode', 'Optimized', 'good');
             };
             
+            /**
+             * Render Star Background
+             */
             const renderStars = (dt) => {
                 const renderer = renderers.get('starCanvas');
                 if (!renderer) return;
@@ -1101,15 +1134,17 @@
                 
                 renderer.clear();
                 
+                // Subtle radial gradient
                 const gradient = ctx.createRadialGradient(
                     currentState.mouseX, currentState.mouseY, 0,
                     width / 2, height / 2, width
                 );
-                gradient.addColorStop(0, `rgba(138, 43, 226, ${0.02 + currentState.scrollProgress * 0.03})`);
+                gradient.addColorStop(0, `rgba(138, 43, 226, ${0.015 + currentState.scrollProgress * 0.02})`);
                 gradient.addColorStop(1, 'transparent');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, width, height);
                 
+                // Batch render stars
                 ctx.fillStyle = 'white';
                 ctx.beginPath();
                 
@@ -1120,12 +1155,12 @@
                     const size = stars[idx + 2];
                     const phase = stars[idx + 4];
                     
-                    const parallax = size > 1 ? 0.5 : 0.3;
-                    const offsetX = (currentState.mouseX / width - 0.5) * parallax * 50;
-                    const offsetY = (currentState.mouseY / height - 0.5) * parallax * 50;
+                    const parallax = size > 1 ? 0.4 : 0.2;
+                    const offsetX = (currentState.mouseX / width - 0.5) * parallax * 40;
+                    const offsetY = (currentState.mouseY / height - 0.5) * parallax * 40;
                     
-                    const brightness = Math.sin(phase) * 0.5 + 0.5;
-                    ctx.globalAlpha = brightness * 0.8 + 0.2;
+                    const brightness = Math.sin(phase) * 0.4 + 0.6;
+                    ctx.globalAlpha = brightness;
                     
                     ctx.moveTo(x + offsetX + size, y + offsetY);
                     ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
@@ -1137,28 +1172,34 @@
                 ctx.globalAlpha = 1;
             };
             
+            /**
+             * Create Sparkle Effect
+             */
             const createSparkles = (x, y) => {
                 const currentState = state.get();
-                const effectiveCount = Math.floor(5 * currentState.reductionFactor);
+                const count = Math.floor(4 * currentState.reductionFactor);
                 
-                for (let i = 0; i < effectiveCount; i++) {
+                for (let i = 0; i < count; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 50 + 25;
+                    const speed = Math.random() * 40 + 20;
                     
                     const vel = vec2Pool.acquire(
                         Math.cos(angle) * speed,
                         Math.sin(angle) * speed
                     );
                     
-                    sparkles.spawn(x, y, vel.x, vel.y, Math.random() * 0.5 + 0.3, Math.random() * 3 + 1);
-                    vec2Pool.release(vel);
+                    sparkles.spawn(x, y, vel.x, vel.y, Math.random() * 0.4 + 0.2, Math.random() * 2.5 + 1);
+                    vec2Pool.release();
                 }
             };
             
+            /**
+             * Render Sparkles
+             */
             const renderSparkles = (dt) => {
                 const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
                 
-                sparkles.update(dt, 100, width, height);
+                sparkles.update(dt, 80, width, height);
                 
                 const renderer = renderers.get('sparkleCanvas');
                 if (!renderer) return;
@@ -1179,28 +1220,34 @@
                     const life = lifetimes[i] / maxLifetimes[i];
                     const size = sizes[i];
                     
-                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
-                    gradient.addColorStop(0, `rgba(255, 255, 255, ${life})`);
-                    gradient.addColorStop(0.5, `rgba(183, 148, 246, ${life * 0.5})`);
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 2.5);
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${life * 0.9})`);
+                    gradient.addColorStop(0.5, `rgba(183, 148, 246, ${life * 0.4})`);
                     gradient.addColorStop(1, 'transparent');
                     
                     ctx.fillStyle = gradient;
-                    ctx.fillRect(x - size * 3, y - size * 3, size * 6, size * 6);
+                    ctx.fillRect(x - size * 2.5, y - size * 2.5, size * 5, size * 5);
                 }
             };
             
+            /**
+             * Create Mouse Trail
+             */
             const createTrail = (x, y) => {
                 const currentState = state.get();
-                if (Math.random() < currentState.reductionFactor) {
+                if (Math.random() < currentState.reductionFactor * 0.8) {
                     const vel = vec2Pool.acquire(
-                        (Math.random() - 0.5) * 20,
-                        (Math.random() - 0.5) * 20
+                        (Math.random() - 0.5) * 15,
+                        (Math.random() - 0.5) * 15
                     );
-                    trails.spawn(x, y, vel.x, vel.y, 1.5, 2);
-                    vec2Pool.release(vel);
+                    trails.spawn(x, y, vel.x, vel.y, 1.2, 2);
+                    vec2Pool.release();
                 }
             };
             
+            /**
+             * Render Mouse Trails
+             */
             const renderTrails = (dt) => {
                 const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
                 
@@ -1225,33 +1272,39 @@
                     const y = positions[idx2 + 1];
                     const life = lifetimes[i] / maxLifetimes[i];
                     
-                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 8);
-                    gradient.addColorStop(0, `rgba(183, 148, 246, ${life * 0.6})`);
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 6);
+                    gradient.addColorStop(0, `rgba(183, 148, 246, ${life * 0.5})`);
                     gradient.addColorStop(1, 'transparent');
                     
                     ctx.fillStyle = gradient;
-                    ctx.fillRect(x - 8, y - 8, 16, 16);
+                    ctx.fillRect(x - 6, y - 6, 12, 12);
                 }
                 
                 ctx.globalCompositeOperation = 'source-over';
             };
             
+            /**
+             * Initialize Floating Orbs
+             */
             const initOrbs = () => {
                 const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
                 
                 orbs.clear();
                 
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 20; i++) {
                     const pos = vec2Pool.acquire(Math.random() * width, Math.random() * height);
-                    orbs.spawn(pos.x, pos.y, 0, 0, Infinity, Math.random() * 30 + 10);
-                    vec2Pool.release(pos);
+                    orbs.spawn(pos.x, pos.y, 0, 0, Infinity, Math.random() * 25 + 10);
+                    vec2Pool.release();
                     
                     const idx2 = i * 2;
-                    orbVelocities[idx2] = (Math.random() - 0.5) * 20;
-                    orbVelocities[idx2 + 1] = (Math.random() - 0.5) * 20;
+                    orbVelocities[idx2] = (Math.random() - 0.5) * 15;
+                    orbVelocities[idx2 + 1] = (Math.random() - 0.5) * 15;
                 }
             };
             
+            /**
+             * Render Floating Orbs
+             */
             const renderOrbs = (dt) => {
                 const { width, height } = renderers.get('starCanvas')?.getDimensions() || { width: window.innerWidth, height: window.innerHeight };
                 const currentState = state.get();
@@ -1268,40 +1321,28 @@
                     const dx = mousePos.x - positions[idx2];
                     const dy = mousePos.y - positions[idx2 + 1];
                     const distSq = dx * dx + dy * dy;
-                    const threshold = 200 * 200;
+                    const threshold = 150 * 150;
                     
                     if (distSq > 0 && distSq < threshold) {
-                        const force = (threshold - distSq) / (threshold * 10);
+                        const force = (threshold - distSq) / (threshold * 8);
                         orbVelocities[idx2] += dx * force;
                         orbVelocities[idx2 + 1] += dy * force;
                     }
                     
-                    orbVelocities[idx2] *= 0.98;
-                    orbVelocities[idx2 + 1] *= 0.98;
+                    orbVelocities[idx2] *= 0.97;
+                    orbVelocities[idx2 + 1] *= 0.97;
                     
                     positions[idx2] += orbVelocities[idx2] * dt;
                     positions[idx2 + 1] += orbVelocities[idx2 + 1] * dt;
                     
                     const size = sizes[i];
-                    if (positions[idx2] < -size) {
-                        positions[idx2] = width + size;
-                        orbVelocities[idx2] *= 0.5;
-                    }
-                    if (positions[idx2] > width + size) {
-                        positions[idx2] = -size;
-                        orbVelocities[idx2] *= 0.5;
-                    }
-                    if (positions[idx2 + 1] < -size) {
-                        positions[idx2 + 1] = height + size;
-                        orbVelocities[idx2 + 1] *= 0.5;
-                    }
-                    if (positions[idx2 + 1] > height + size) {
-                        positions[idx2 + 1] = -size;
-                        orbVelocities[idx2 + 1] *= 0.5;
-                    }
+                    if (positions[idx2] < -size) positions[idx2] = width + size;
+                    if (positions[idx2] > width + size) positions[idx2] = -size;
+                    if (positions[idx2 + 1] < -size) positions[idx2 + 1] = height + size;
+                    if (positions[idx2 + 1] > height + size) positions[idx2 + 1] = -size;
                 }
                 
-                vec2Pool.release(mousePos);
+                vec2Pool.release();
                 
                 const renderer = renderers.get('orbCanvas');
                 if (!renderer) return;
@@ -1311,17 +1352,17 @@
                 
                 ctx.globalCompositeOperation = 'lighter';
                 
-                const hue = 270 + Math.sin(currentState.time * 2) * 30;
+                const hue = 270 + Math.sin(currentState.time * 1.5) * 25;
                 
                 for (let i = 0; i < count; i++) {
                     const idx2 = i * 2;
                     const x = positions[idx2];
                     const y = positions[idx2 + 1];
                     const size = sizes[i];
-                    const orbHue = hue + i * 5;
+                    const orbHue = hue + i * 8;
                     
                     const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-                    gradient.addColorStop(0, `hsla(${orbHue}, 70%, 60%, 0.3)`);
+                    gradient.addColorStop(0, `hsla(${orbHue}, 70%, 60%, 0.25)`);
                     gradient.addColorStop(1, 'transparent');
                     
                     ctx.fillStyle = gradient;
@@ -1331,56 +1372,43 @@
                 ctx.globalCompositeOperation = 'source-over';
             };
             
+            /**
+             * Adaptive Performance Optimization
+             */
             const autoOptimize = () => {
                 const avgFPS = PerfMonitor.getAvgFPS();
                 const currentReduction = state.get().reductionFactor;
                 let newReduction = currentReduction;
                 
-                if (avgFPS < 35) {
-                    newReduction = Math.max(0.3, currentReduction - 0.15);
+                if (avgFPS < 40) {
+                    newReduction = Math.max(0.4, currentReduction - 0.1);
                 } else if (avgFPS > 55 && currentReduction < 1) {
                     newReduction = Math.min(1, currentReduction + 0.05);
                 }
                 
-                if (newReduction !== currentReduction) {
+                if (Math.abs(newReduction - currentReduction) > 0.01) {
                     state.update({ reductionFactor: newReduction });
-                    
-                    if (newReduction < 1) {
-                        const sparkleLifetimes = sparkles.getLifetimes();
-                        const trailLifetimes = trails.getLifetimes();
-                        const orbLifetimes = orbs.getLifetimes();
-                        
-                        const cullCount = Math.floor(50 * (1 - newReduction));
-                        for (let i = 0; i < cullCount; i++) {
-                            if (i < sparkleLifetimes.length) sparkleLifetimes[i] = 0;
-                            if (i < trailLifetimes.length) trailLifetimes[i] = 0;
-                            if (i < orbLifetimes.length) orbLifetimes[i] = 0;
-                        }
-                    }
-                    
                     updatePerfStat('reductionFactor', newReduction.toFixed(2), 
                         newReduction >= 0.9 ? 'good' : newReduction >= 0.6 ? 'value' : 'warning');
                 }
             };
             
+            /**
+             * Universal Pointer Movement Handler
+             */
             const handlePointerMove = throttle((x, y) => {
                 state.update({ mouseX: x, mouseY: y });
                 
                 document.documentElement.style.setProperty('--mouse-x', `${(x / window.innerWidth) * 100}%`);
                 document.documentElement.style.setProperty('--mouse-y', `${(y / window.innerHeight) * 100}%`);
                 
-                if (Math.random() > 0.7) {
-                    createSparkles(x, y);
-                }
+                if (Math.random() > 0.75) createSparkles(x, y);
                 createTrail(x, y);
             }, 16);
             
-            const handleMouseMove = (e) => {
-                handlePointerMove(e.clientX, e.clientY);
-            };
+            const handleMouseMove = (e) => handlePointerMove(e.clientX, e.clientY);
             
             const handleTouchMove = (e) => {
-                e.preventDefault();
                 if (e.touches.length > 0) {
                     const touch = e.touches[0];
                     handlePointerMove(touch.clientX, touch.clientY);
@@ -1394,10 +1422,11 @@
                 }
             };
             
-            const handleClick = (e) => {
-                createSparkles(e.clientX, e.clientY);
-            };
+            const handleClick = (e) => createSparkles(e.clientX, e.clientY);
             
+            /**
+             * Scroll Progress Handler
+             */
             const handleScroll = rafDebounce(() => {
                 const scrolled = window.pageYOffset;
                 const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -1406,17 +1435,19 @@
                 state.update({ scrollProgress: progress });
                 
                 document.documentElement.style.setProperty('--scroll-progress', progress);
-                document.documentElement.style.setProperty('--hue-shift', progress * 20);
+                document.documentElement.style.setProperty('--hue-shift', progress * 15);
             });
             
+            /**
+             * Resize Handler with State Preservation
+             */
             const handleResize = rafDebounce(() => {
                 state.update({ isPaused: true });
                 
                 const oldDims = renderers.get('starCanvas')?.getDimensions();
-                
                 renderers.forEach(renderer => renderer.resize());
-                
                 const newDims = renderers.get('starCanvas')?.getDimensions();
+                
                 if (oldDims && newDims) {
                     const scaleX = newDims.width / oldDims.width;
                     const scaleY = newDims.height / oldDims.height;
@@ -1429,9 +1460,12 @@
                     }
                 }
                 
-                setTimeout(() => state.update({ isPaused: false }), 100);
+                setTimeout(() => state.update({ isPaused: false }), 50);
             });
             
+            /**
+             * Intersection Observer for Scroll Animations
+             */
             const setupIntersectionObserver = () => {
                 const observer = new IntersectionObserver(
                     (entries) => {
@@ -1441,7 +1475,7 @@
                             }
                         });
                     },
-                    { threshold: [0.1, 0.5], rootMargin: '0px' }
+                    { threshold: 0.1, rootMargin: '50px' }
                 );
                 
                 ['#letter', '#birthdayWishes'].forEach(selector => {
@@ -1450,6 +1484,9 @@
                 });
             };
             
+            /**
+             * 3D Tilt Effect for Image
+             */
             const setupMemoryTilt = () => {
                 const memories = document.querySelectorAll('.memory[data-tilt]');
                 
@@ -1459,21 +1496,15 @@
                         const relX = (x - rect.left) / rect.width - 0.5;
                         const relY = (y - rect.top) / rect.height - 0.5;
                         
-                        const scale = 1.05;
-                        const translateZ = 50;
-                        
                         memory.style.transform = `
-                            translateZ(${translateZ}px)
-                            rotateY(${relX * 20}deg)
-                            rotateX(${-relY * 20}deg)
-                            scale(${scale})
+                            translateZ(50px)
+                            rotateY(${relX * 15}deg)
+                            rotateX(${-relY * 15}deg)
+                            scale(1.05)
                         `;
                     }, 16);
                     
-                    memory.addEventListener('mousemove', (e) => {
-                        handleTilt(e.clientX, e.clientY);
-                    }, { passive: true });
-                    
+                    memory.addEventListener('mousemove', (e) => handleTilt(e.clientX, e.clientY), { passive: true });
                     memory.addEventListener('touchmove', (e) => {
                         if (e.touches.length > 0) {
                             const touch = e.touches[0];
@@ -1490,6 +1521,9 @@
                 });
             };
             
+            /**
+             * Image Error Handling
+             */
             const setupImageErrorHandling = () => {
                 const images = document.querySelectorAll('.memory img');
                 images.forEach(img => {
@@ -1500,6 +1534,9 @@
                 });
             };
             
+            /**
+             * Audio Error Handling
+             */
             const setupAudioErrorHandling = () => {
                 const audio = document.getElementById('bgMusic');
                 if (audio) {
@@ -1516,6 +1553,9 @@
                 }
             };
             
+            /**
+             * Touch Device Detection
+             */
             const detectTouchDevice = () => {
                 const isTouchDevice = (
                     ('ontouchstart' in window) ||
@@ -1528,17 +1568,20 @@
             
             let lastTime = performance.now();
             let animationId = null;
-            let frameSkipCount = 0;
+            let frameCounter = 0;
             
+            /**
+             * Main Animation Loop
+             */
             const animate = (currentTime) => {
                 animationId = requestAnimationFrame(animate);
                 
-                const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+                const dt = Math.min((currentTime - lastTime) / 1000, 0.05);
                 lastTime = currentTime;
                 
                 PerfMonitor.update();
                 
-                if (frameSkipCount++ % 30 === 0) {
+                if (frameCounter++ % 30 === 0) {
                     autoOptimize();
                     
                     const totalParticles = sparkles.getCount() + trails.getCount() + orbs.getCount();
@@ -1550,9 +1593,6 @@
                     updatePerfStat('memUsage', getMemoryUsage());
                 }
                 
-                const fps = PerfMonitor.getFPS();
-                if (fps < 25 && frameSkipCount % 2 === 0) return;
-                
                 if (state.get().isPaused) return;
                 
                 state.update(s => ({ time: s.time + dt }));
@@ -1562,11 +1602,12 @@
                 renderTrails(dt);
                 renderOrbs(dt);
                 
-                if (frameSkipCount % 60 === 0) {
-                    vec2Pool.releaseAll();
-                }
+                if (frameCounter % 120 === 0) vec2Pool.releaseAll();
             };
             
+            /**
+             * Start Experience
+             */
             const startExperience = async () => {
                 const entryOverlay = document.getElementById('entryOverlay');
                 const mainContainer = document.getElementById('mainContainer');
@@ -1608,16 +1649,18 @@
                 animationId = requestAnimationFrame(animate);
             };
             
+            /**
+             * Initialize Application
+             */
             const init = () => {
                 initStars();
                 initRenderers();
                 initOrbs();
-                
                 detectTouchDevice();
                 
-                // Universal pointer event handling
+                // Universal event listeners
                 document.addEventListener('mousemove', handleMouseMove, { passive: true });
-                document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                document.addEventListener('touchmove', handleTouchMove, { passive: true });
                 document.addEventListener('touchstart', handleTouchStart, { passive: true });
                 document.addEventListener('click', handleClick, { passive: true });
                 
@@ -1636,10 +1679,11 @@
                 setupMemoryTilt();
                 setupImageErrorHandling();
                 setupAudioErrorHandling();
-                
-                state.update({ canvasReady: true });
             };
             
+            /**
+             * Cleanup Resources
+             */
             const cleanup = () => {
                 if (animationId) cancelAnimationFrame(animationId);
                 vec2Pool.releaseAll();
@@ -1649,11 +1693,11 @@
             
             return Object.freeze({
                 init,
-                getState: () => state.get(),
                 cleanup
             });
         })();
 
+        // Initialize on DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', CosmicBirthday.init);
         } else {
